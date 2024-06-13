@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from store.models import Product
+from store.models import Product, Variation,  variation_category_choice
 from .models import Cart, CartItem
 
 # Create your views here.
@@ -19,28 +19,85 @@ def _cart_id(request):
     return cart
 
 #=================functions to ==================add cart ======================
+
+
+
 def add_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)  # Ensure the product exists
+    product_variation = []
+    
+    if request.method == "POST":
+        for key, value in request.POST.items():
+            # Check if the key is in the variation_category_choice
+            if key in dict(variation_category_choice):
+                print(f"Processing variation category: {key}, value: {value}")
+                try:
+                    # Fetch the variation based on category and value
+                    variation = Variation.objects.get(
+                        product=product,
+                        variation_category__iexact=key,
+                        variation_value__iexact=value
+                    )
+                    product_variation.append(variation)
+                    print(f"Added variation: {variation}")
+                except Variation.DoesNotExist:
+                    print(f"No variation found for {key}: {value}")
+                    pass
     
     cart_id = _cart_id(request)  # Get the cart session ID
     
     # Ensure a cart exists
     cart, created = Cart.objects.get_or_create(cart_id=cart_id)
     
-    # Add or update the cart item
-    try:
-        cart_item = CartItem.objects.get(product=product, cart=cart)
-        cart_item.quantity += 1
-        cart_item.save()
-    except CartItem.DoesNotExist:
+    # Check if the cart item already exists
+    is_cart_item_exists = CartItem.objects.filter(product=product, cart=cart).exists()
+    
+    if is_cart_item_exists:
+        # Get existing cart items
+        cart_items = CartItem.objects.filter(product=product, cart=cart)
+        
+        ex_var_list = []
+        id_list = []
+        
+        for item in cart_items:
+            existing_variations = item.variations.all()
+            ex_var_list.append(list(existing_variations))
+            id_list.append(item.id)
+        
+        print(f"Existing variations: {ex_var_list}")
+        
+        if product_variation in ex_var_list:
+            # If the variation already exists in the cart, increase the quantity
+            index = ex_var_list.index(product_variation)
+            item_id = id_list[index]
+            cart_item = CartItem.objects.get(product=product, id=item_id)
+            cart_item.quantity += 1
+            cart_item.save()
+        else:
+            # Create a new cart item with the given variation
+            cart_item = CartItem.objects.create(
+                product=product,
+                quantity=1,
+                cart=cart
+            )
+            if product_variation:
+                cart_item.variations.add(*product_variation)  # Add the variations
+            cart_item.save()
+    else:
+        # Create a new cart item if it doesn't exist
         cart_item = CartItem.objects.create(
             product=product,
             quantity=1,
-            cart=cart,
+            cart=cart
         )
+        if product_variation:
+            cart_item.variations.add(*product_variation)  # Add the variations
         cart_item.save()
+    
     # Redirect to the cart page
     return redirect('cart')
+
+
 #=================functions to ==================remove cart======================
 def _cart_id(request):
     """

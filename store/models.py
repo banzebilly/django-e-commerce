@@ -61,36 +61,33 @@ class Product(models.Model):
     
     
 
-#=====================this is a variation class start here============================l
-# class VariationManager(models.Manager):
-#     #=================this is for the color===================
-#     def colors(self):
-#         return super(VariationManager, self).filter(variation_category='color', is_active=True)
-#     #========================this is for the size==================
-#     def sizes(self):
-#         return super(VariationManager, self).filter(variation_category='size', is_active=True)
-        
+from django.db import models
+
+variation_category_choice = (
+    ('color', 'color'),
+    ('size', 'size'),
+)
+
+class VariationManager(models.Manager):
+    def colors(self):
+        return self.filter(variation_category='color', is_active=True)
     
+    def sizes(self):
+        return self.filter(variation_category='size', is_active=True)
     
+class Variation(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variation_category = models.CharField(max_length=100, choices=variation_category_choice)
+    variation_value = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    createe_date = models.DateTimeField(auto_now=True)
     
-# variation_category_choice = (
-#     #this turple
-#     ('color', 'color'),
-#     ('size', 'size'),
-# )
-# class Variation(models.Model):
-#     product            = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     variation_category = models.CharField(max_length=100, choices=variation_category_choice)
-#     variation_value    = models.CharField(max_length=100)
-#     #this active will help us to disable if one of the vation is no loger need or not there
-#     is_active          = models.BooleanField(default=True)
-#     createe_date       = models.DateTimeField(auto_now=True)
+    objects = VariationManager()
     
-#     #now we need to tell the variation models that we re using VariationManager
-#     objects = VariationManager()
-    
-#     def __str__(self):
-#         return self.variation_value
+    def __str__(self):
+        return self.variation_value
+
+
     
     
 # #revieew and rating system we need the models
