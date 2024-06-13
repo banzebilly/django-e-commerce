@@ -141,6 +141,8 @@ def remove_cart_item(request, product_id, cart_item_id ):
 
 #=================functions to ==================cart page======================
 def cart(request, total=0, quantity=0, cart_items=None):
+    tax= 0
+    grand_total = 0
     try:
         # Get the cart using the session cart_id
         cart = Cart.objects.get(cart_id=_cart_id(request))

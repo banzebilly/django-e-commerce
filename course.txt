@@ -29,8 +29,8 @@ view.py:
         else:
     #-------------------------------------------endof product by categories-----------------------------------------------------------    
             products = Product.objects.all().filter(is_available=True)
-            product_count = products.count()
-            context = {
+        product_count = products.count()
+        context = {
                 'products': products,
                 'product_count': product_count,
             }
