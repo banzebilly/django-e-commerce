@@ -108,7 +108,7 @@ def _cart_id(request):
         cart = request.session.create()
     return cart
 
-def remove_cart(request, product_id):
+def remove_cart(request, product_id, cart_item_id):
     """
     Remove an item from the cart or reduce its quantity by one.
     """
@@ -116,23 +116,26 @@ def remove_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     
     # Get the specific cart item for the product in the cart
-    cart_item = CartItem.objects.get(product=product, cart=cart)
-    
-    # Reduce the quantity or remove the cart item
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1  # Decrease the quantity by 1
-        cart_item.save()         # Save the updated cart item
-    else:
-        cart_item.delete()       # Remove the cart item if the quantity is 1
+    try:
+        cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        
+        # Reduce the quantity or remove the cart item
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1  # Decrease the quantity by 1
+            cart_item.save()         # Save the updated cart item
+        else:
+            cart_item.delete()       # Remove the cart item if the quantity is 1
+    except CartItem.DoesNotExist:
+        pass
 
     # Redirect to the cart view to reflect changes
     return redirect('cart')
 
-def remove_cart_item(request, product_id):
+def remove_cart_item(request, product_id, cart_item_id ):
     cart = Cart.objects.get(cart_id=_cart_id(request))
     product = get_object_or_404(Product, id=product_id)
     # Get the specific cart item for the product in the cart
-    cart_item = CartItem.objects.get(product=product, cart=cart)
+    cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
     cart_item.delete()
     return  redirect('cart')
 
