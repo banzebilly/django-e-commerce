@@ -1,0 +1,67 @@
+tell django settings that u re using custom model on the settings.py:
+                 AUTH_USER_MODEL = 'accounts.Account'
+
+==============================================================================
+
+desplay product by categoy
+-----------------------------------------------------------------------------------------------------------
+ceate a url ;
+ #desplay products by category
+    path('<slug:category_slug>/', views.store, name='product_by_category'),
+
+====================================================================================
+view.py:
+    from django.shortcuts import render, get_object_or_404
+    from .models import Product, PCategory
+
+    # Create your views here.
+
+    def store(request, category_slug=None):
+
+        categories = None
+        products = None
+        #check if there is something in the slug
+        if category_slug is not None:
+            categories = get_object_or_404(PCategory, slug=category_slug)
+            products = Product.objects.filter(category=categories, is_available=True)
+            product_count = products.count()
+
+        else:
+    #-------------------------------------------endof product by categories-----------------------------------------------------------    
+            products = Product.objects.all().filter(is_available=True)
+            product_count = products.count()
+            context = {
+                'products': products,
+                'product_count': product_count,
+            }
+            return render(request, 'store/store.html', context)
+
+-------------------------------============================================================
+in the store app create a file called context_processors.py:
+       from .models import PCategory
+
+def menu_links(request):
+    links = PCategory.objects.all()
+    return {'links': links}
+
+---------------------------------------------------------------------------------=============
+got to settings.py include it on the template sections
+        TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                  # Custom context processor
+                'store.context_processors.menu_links',
+                # 'cart.context_processors.counter',
+            ],
+        },
+    },
+]
+

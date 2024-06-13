@@ -1,0 +1,71 @@
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ecf0f3;
+    font-family: sans-serif;
+    color: #555;
+    font-weight: 700;
+}
+
+.card {
+    border-radius: 20px;
+    background-color: #ecf0f3;
+    padding: 40px;
+    box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5);
+}
+
+.card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.form-control {
+    border: none;
+    outline: none;
+    background: none;
+    color: #555;
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: inset 8px 8px 16px #cbced1, inset -8px -8px 16px #fff;
+}
+
+.input-group-text {
+    border: none;
+    background: none;
+}
+
+.btn-primary {
+    background-color: #02c8db;
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 700;
+    width: 100%;
+    padding: 10px;
+    box-shadow: 3px 3px 8px #b1b1b1, -3px -3px 8px #fff;
+}
+
+.btn-primary:hover {
+    background-color: #50e5b9;
+}
+
+.text-primary {
+    color: #02c8db !important;
+}
+
+a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+a:hover {
+    color: #02c8db;
+    text-decoration: underline;
+}
