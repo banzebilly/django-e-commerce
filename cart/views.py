@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from store.models import Product, Variation,  variation_category_choice
 from .models import Cart, CartItem
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 '''
@@ -141,6 +142,46 @@ def remove_cart_item(request, product_id, cart_item_id ):
 
 #=================functions to ==================cart page======================
 def cart(request, total=0, quantity=0, cart_items=None):
+   
+    try:
+        tax= 0
+        grand_total = 0
+        
+        # Get the cart using the session cart_id
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        # Get all active cart items for this cart
+        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
+        # Loop through each cart item to calculate the total and quantity
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)
+            quantity += cart_item.quantity
+        tax = (2 * total) / 100
+        grand_total = total + tax
+
+    except Cart.DoesNotExist:
+        # If the cart does not exist, initialize with default empty values
+        cart_items = []
+        total = 0
+        quantity = 0
+
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items,
+        'tax': tax,
+        'grand_total': grand_total
+    }
+
+    return render(request, 'cart/cart.html', context)
+
+
+#========================checkout function start here==============================
+
+
+
+@login_required(login_url='login')
+def checkout(request, total=0, quantity=0, cart_items=None):
     tax= 0
     grand_total = 0
     try:
@@ -170,4 +211,6 @@ def cart(request, total=0, quantity=0, cart_items=None):
         'grand_total': grand_total
     }
 
-    return render(request, 'cart/cart.html', context)
+    return render(request, 'cart/checkout.html', context)
+
+

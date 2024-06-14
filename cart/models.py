@@ -14,9 +14,10 @@ class Cart(models.Model):
 
 #====================cart item model=====================================================
 class CartItem(models.Model):
+    user =  models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     variations = models.ManyToManyField(Variation, blank=True)
-    cart       = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart       = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     quantity       = models.IntegerField()
     is_active      = models.BooleanField(default=True)
     #this will help to get subtotal
@@ -26,5 +27,5 @@ class CartItem(models.Model):
     # def __unicode__(self):
     #     return self.product
     
-    def __unicode__(self):
+    def __self__(self):
         return self.product
