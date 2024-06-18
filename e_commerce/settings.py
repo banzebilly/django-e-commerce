@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'store',
     'accounts',
     'cart',
+    #securing admin pane. record login attempts by duplicating the admin panel
+    'admin_honeypot',
+    # 'honeypot_signals',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +59,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'e_commerce.urls'
+
+# MANAGERS = [
+#     ('Banze Billy', 'bbanze49@gmail.com'),
+    
+# ]
+
 
 TEMPLATES = [
     {
@@ -87,22 +96,22 @@ AUTH_USER_MODEL = 'accounts.Account'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': config('MYSQL_DB_NAME'),
-#         'USER': config('MYSQL_DB_USER'),
-#         'PASSWORD': config('MYSQL_DB_PASSWORD'),
-#         'HOST': config('MYSQL_DB_HOST'),
-#         'PORT': config('MYSQL_DB_PORT'),
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+    }
+}
 
 
 # Password validation

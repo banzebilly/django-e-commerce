@@ -100,14 +100,6 @@ def add_cart(request, product_id):
 
 
 #=================functions to ==================remove cart======================
-def _cart_id(request):
-    """
-    Retrieve or create a unique session ID for the cart.
-    """
-    cart = request.session.session_key
-    if not cart:
-        cart = request.session.create()
-    return cart
 
 def remove_cart(request, product_id, cart_item_id):
     """

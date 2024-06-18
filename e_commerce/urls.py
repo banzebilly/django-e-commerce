@@ -10,7 +10,10 @@ from django.conf import settings
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #securing admin pane. record login attempts by duplicating the admin panel
+    path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
+    #we change the admin/ to secured_billy so that can not access admin panel
+    path('secured_login/', admin.site.urls),
     path('', views.home, name= 'home'),
     path('store/', include('store.urls')),
     path('cart/', include('cart.urls')),
