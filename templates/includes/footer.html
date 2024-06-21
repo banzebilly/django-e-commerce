@@ -1,0 +1,55 @@
+ <!-- Footer Section -->
+ <footer class="bg-dark text-light text-center py-3">
+    <div class="container">
+      <div class="row">
+        <!-- Footer Links -->
+        <div class="col-md-6 mb-3">
+          <h6>Quick Links</h6>
+          <p>
+            <a href="#" class="text-light mr-3">Home</a>
+            <a href="#" class="text-light mr-3">About</a>
+            <a href="#" class="text-light mr-3">Services</a>
+            <a href="#" class="text-light">Contact</a>
+          </p>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-md-6 mb-3">
+          <h6>Contact Us</h6>
+          <p>
+            <i class="fas fa-envelope mr-2"></i>email@example.com<br>
+            <i class="fas fa-phone-alt mr-2"></i>(123) 456-7890
+          </p>
+        </div>
+      </div>
+
+      <!-- Social Media Icons -->
+      <div class="my-3">
+        <a href="#" class="text-light mr-3"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-light mr-3"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="text-center">
+        <p class="mb-0">&copy; 2024 Your Company. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and dependencies (Popper.js and jQuery) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+  
+    <script>
+        $(document).ready(function() {
+            $('.thumb .thumbnail-link').click(function(e) {
+                e.preventDefault();
+                var imageUrl = $(this).attr("href");
+                $('.img-big-wrap img').attr('src', imageUrl);
+            });
+        });
+
+    </script>
+
+</body>
+</html>

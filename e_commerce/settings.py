@@ -42,9 +42,17 @@ INSTALLED_APPS = [
     'store',
     'accounts',
     'cart',
+    # Required for django-allauth
+   'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # Providers
+    'allauth.socialaccount.providers.google',
     #securing admin pane. record login attempts by duplicating the admin panel
     'admin_honeypot',
     # 'honeypot_signals',
+
 ]
 
 MIDDLEWARE = [
@@ -55,8 +63,33 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Add the allauth AccountMiddleware here
+    'allauth.account.middleware.AccountMiddleware',
     # 'django.middleware.static.StaticFilesMiddleware',
 ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ROOT_URLCONF = 'e_commerce.urls'
 
@@ -81,6 +114,7 @@ TEMPLATES = [
                 'store.context_processors.menu_links',
                 #this what will make the add to cart icon to work
                 'cart.context_processors.counter',
+               
             ],
         },
     },
@@ -92,6 +126,11 @@ WSGI_APPLICATION = 'e_commerce.wsgi.application'
 #telling django we re using custom model
 AUTH_USER_MODEL = 'accounts.Account'
 
+#Add the allauth authentication backends to AUTHENTICATION_BACKENDS:
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -164,7 +203,8 @@ MEDIA_ROOT = BASE_DIR / 'media'     #This specifies the directory where media fi
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
-
+#django-all
+SITE_ID = 1
 # SMTP Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

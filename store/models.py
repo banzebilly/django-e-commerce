@@ -4,7 +4,8 @@
 from django.db import models
 from django.forms import ValidationError
 from django.urls import reverse
-# from accounts.models import Account
+from accounts.models import Account
+from django.db.models import Avg, Count
 
 
 class PCategory(models.Model):
@@ -58,6 +59,17 @@ class Product(models.Model):
     
     def __str__(self):
         return self.product_name
+
+    #===========calculating the rating average=========================
+    def averageReview(self):
+            reviews = ReviewRating.objects.filter(product=self, status=True).aggregate(average=Avg('rating'))
+            return reviews['average'] or 0.0
+
+       
+    #===========calculating count review=========================
+    def countReview(self):
+            reviews = ReviewRating.objects.filter(product=self, status=True).aggregate(count=Count('id'))
+            return reviews['count'] or 0
     
     
 
@@ -92,18 +104,33 @@ class Variation(models.Model):
     
 # #revieew and rating system we need the models
 # #after creating the models you need to create a review form.py file in store app
-# class ReviewRating(models.Model):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-#     subject = models.CharField(max_length=100, blank=True)
-#     review = models.TextField(max_length=500, blank = True)
-#     rating = models.FloatField()
-#     ip = models.CharField(max_length=20, blank=True)
-#     status = models.BooleanField(default=True)
+class ReviewRating(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=100, blank=True)
+    review = models.TextField(max_length=500, blank = True)
+    rating = models.FloatField()
+    ip = models.CharField(max_length=20, blank=True)
+    status = models.BooleanField(default=True)
     
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
     
-#     def __str__(self):
-#         return self.subject
+    def __str__(self):
+        return self.subject
 
+#==============product gallary======================================start here
+class ProductGallary(models.Model):
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    image = models.ImageField(upload_to="store/products", max_length=255)
+
+    def __str__(self):
+
+        return self. product.product_name
+
+
+    class Meta:
+
+        verbose_name_plural = 'product gallary'

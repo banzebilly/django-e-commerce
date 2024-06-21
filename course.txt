@@ -65,3 +65,8 @@ got to settings.py include it on the template sections
     },
 ]
 
+
+
+python manage.py shell
+>>> from django.core.cache import cache
+>>> cache.clear()

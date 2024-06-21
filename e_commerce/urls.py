@@ -14,6 +14,9 @@ urlpatterns = [
     path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
     #we change the admin/ to secured_billy so that can not access admin panel
     path('secured_login/', admin.site.urls),
+    #allauth url
+    path('account/', include('allauth.urls')),
+    #my site urls
     path('', views.home, name= 'home'),
     path('store/', include('store.urls')),
     path('cart/', include('cart.urls')),
