@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'store',
     'accounts',
     'cart',
+    'orders',
     # Required for django-allauth
    'django.contrib.sites',
     'allauth',

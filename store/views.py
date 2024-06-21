@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 
 from cart.models import CartItem, Cart
+from orders.models import OrderProduct
 from .forms import ReviewForm
 from .models import Product, PCategory, ProductGallary, ReviewRating
 from cart.views import _cart_id
@@ -10,28 +11,20 @@ from django.shortcuts import redirect
 
 def store(request, category_slug=None):
     categories = None
-    products = None
+    products = Product.objects.filter(is_available=True)
 
     if category_slug:
         categories = get_object_or_404(PCategory, slug=category_slug)
-        products = Product.objects.filter(category=categories, is_available=True)
-        #paginator start here
-        paginator = Paginator(products, 3)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
-    else:
-        products = Product.objects.filter(is_available=True)
-        #paginator start here
-        paginator = Paginator(products, 6)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
+        products = products.filter(category=categories)
 
-     
+    # Paginator setup
+    paginator = Paginator(products, 6)  # Default to 6 products per page
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
 
-    product_count = products.count()
     context = {
-        'products': paged_products, #because we want to use paginator instead of products
-        'product_count': product_count,
+        'products': paged_products,
+        'categories': categories,
     }
 
     return render(request, 'store/store.html', context)
@@ -45,7 +38,13 @@ def product_detail(request, category_slug, product_slug):
 
     except Exception as e:
         raise e
+     
+    if user.is_authenticate:
 
+        try:
+            orderproduct = OrderProduct.objects.filter(user=request.user, product_id=single_product.id).exist()
+        except OrderProduct.DoesNotExist:
+            orderproduct = None
     
     #get  the review ==============here==============================
     reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
