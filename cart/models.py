@@ -14,7 +14,7 @@ class Cart(models.Model):
 
 #====================cart item model=====================================================
 class CartItem(models.Model):
-    user =  models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
+    user =  models.ForeignKey(Account, on_delete=models.CASCADE, null=True) # assigning cartitem to the user
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     variations = models.ManyToManyField(Variation, blank=True)
     cart       = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)

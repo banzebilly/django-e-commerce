@@ -5,7 +5,7 @@ from .forms import RegistrationForm
 from .models import Account
 from django.contrib import messages, auth
 from django.http import HttpResponse
-from cart.models import Cart, CartItem
+from cart.models import Cart, CartItem, Variation
 from cart.views import _cart_id
 
 from django.contrib.auth.decorators import login_required
@@ -68,63 +68,57 @@ def register(request):
     return render(request, 'accounts/register.html', context)
 
 #=====================login function=================================================
+
+
 def login(request):
     if request.method == 'POST':
-        email  = request.POST['email']
-        password  = request.POST['password']
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        # Authenticate user
         user = auth.authenticate(email=email, password=password)
         
         if user is not None:
-            #this try and except block help us to check if there is  a item in the cart before we login
             try:
+                # Retrieve the session-based cart
                 cart = Cart.objects.get(cart_id=_cart_id(request))
-                
-                is_cart_item_exists = CartItem.objects.filter( cart=cart).exists() #if there is something
-                #make a condition cart exist
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+
                 if is_cart_item_exists:
-                    cart_item = CartItem.objects.filter(cart=cart)
-                    
-                    #getting product variation by cart id
+                    cart_items = CartItem.objects.filter(cart=cart)
+
                     product_variation = []
-                    for item in cart_item:
-                        variation = item.variation.all()
+                    for item in cart_items:
+                        variation = item.variations.all()
                         product_variation.append(list(variation))
-                        
-                    #get cart items from the user to access his product variation
-                    
-                    cart_item = CartItem.objects.filter( user=user)
+
+                    # Get the user's cart items to access their product variations
+                    user_cart_items = CartItem.objects.filter(user=user)
                     ex_var_list = []
-                    id = []
-                    for item in cart_item:
-                        existing_variation = item.variation.all()
+                    id_list = []
+                    for item in user_cart_items:
+                        existing_variation = item.variations.all()
                         ex_var_list.append(list(existing_variation))
-                        id.append(item.id)
-                    
-                
-                    # product_variation = [1, 2, 3, 4, 6]
-                    # ex_var_list = [4, 6, 3, 5]
+                        id_list.append(item.id)
+                        item.user = user
+
                     for pr in product_variation:
                         if pr in ex_var_list:
                             index = ex_var_list.index(pr)
-                            item_id = id[index]
+                            item_id = id_list[index]
                             item = CartItem.objects.get(id=item_id)
                             item.quantity += 1
                             item.user = user
                             item.save()
                         else:
-                            cart_item = CartItem.objects.filter(cart=cart)
-                                       
-                            for item in cart_item:
-                                item.user = user  #we re assigning it to the user we have alreadyf
+                            for item in cart_items:
+                                item.user = user
                                 item.save()
-                            
-                 
-                
-            except:
-                pass
+            except Cart.DoesNotExist:
+                pass  # If no session cart exists, continue to login
+
             auth.login(request, user)
-            
-            messages.success(request, 'you re now logged in.')
+            messages.success(request, 'You are now logged in.')
             #in order to redirect the user to the proper page when the login we need to install the request library to haddle the sitiution
             url = request.META.get('HTTP_REFERER')
             try:
@@ -134,12 +128,11 @@ def login(request):
                 params = dict(x.split('=') for x in query.split('&'))
                 if 'next' in params:
                     nextpage = params['next']
-                    return redirect(nextpage)
-              
-                    
+                    return redirect(nextpage)      
                 
             except:
-                return redirect('dashboard')
+                pass
+            return redirect('dashboard')   
         else:
             messages.error(request, 'invalid login credentials ')
             return redirect('login')
