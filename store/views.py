@@ -38,13 +38,14 @@ def product_detail(request, category_slug, product_slug):
 
     except Exception as e:
         raise e
-     
-    # if user.is_authenticate:
 
-    #     try:
-    #         orderproduct = OrderProduct.objects.filter(user=request.user, product_id=single_product.id).exist()
-    #     except OrderProduct.DoesNotExist:
-    #         orderproduct = None
+    orderproduct = None
+    if request.user.is_authenticated:
+
+        try:
+            orderproduct = OrderProduct.objects.filter(user=request.user, product_id=single_product.id).exists()
+        except OrderProduct.DoesNotExist:
+            orderproduct = None
     
     #get  the review ==============here==============================
     reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
@@ -56,6 +57,7 @@ def product_detail(request, category_slug, product_slug):
         'in_cart': in_cart,
         'product_gallery': product_gallery, 
         'reviews': reviews,
+        'orderproduct': orderproduct,
     }
 
     return render(request, 'store/product_detail.html', context)

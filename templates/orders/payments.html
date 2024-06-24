@@ -69,8 +69,8 @@
                                     </td>
                                     <td>
                                         <div class="price-wrap">
-                                            <var class="price">R {{ cart_item.sub_total }}</var>
-                                            <small class="text-muted"> R {{ cart_item.product.price }} each </small>
+                                            <var class="price"> {{ cart_item.sub_total }}</var>
+                                            <small class="text-muted"> $ {{ cart_item.product.price }} each </small>
                                         </div>
                                     </td>
                                 </tr>
@@ -121,17 +121,54 @@
 
 <!-- PayPal button configuration -->
 <script>
+    // Django JavaScript for generating CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Wait for the PayPal SDK to load
+    const csrftoken = getCookie('csrftoken');
+    const orderID = "{{ order.order_number }}"; // Ensure this value is properly rendered by Django
+    const url = "{% url 'payments' %}"; // Ensure this URL is correctly rendered by Django
+    const payment_method = 'paypal'; // Properly define the payment method string
+    const redirect_url = "{% url 'order_complete' %}"
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log('PayPal script loaded.');
+
         paypal.Buttons({
-            // Configure the payment
+            // Configure the payment button style
+            style: {
+                color: 'blue',
+                shape: 'rect', // Correct shape value
+                label: 'pay', // Correct label key
+                height: 40 // Ensure height is a number
+            },
+
+            // Set up the transaction
             createOrder: function(data, actions) {
-                console.log('Creating order for amount:', '{{ grand_total }}');
+                // Ensure `{{ grand_total }}` is properly rendered by Django
+                let grandTotal = "{{ grand_total }}"; // This should be a string or a numeric value
+
+                console.log('Creating order for amount:', grandTotal);
+
+                // Create the order with the dynamic amount
                 return actions.order.create({
                     purchase_units: [{
                         amount: {
-                            value: '{{ grand_total }}' // Use the grand total amount dynamically
+                            value: grandTotal // Use the dynamic grand total amount
                         }
                     }]
                 });
@@ -140,16 +177,44 @@
             // Finalize the transaction after payer approval
             onApprove: function(data, actions) {
                 return actions.order.capture().then(function(details) {
-                    alert('Transaction completed by ' + details.payer.name.given_name);
+                    console.log('Transaction details:', details);
+                    sendData();
+
+                    // Send the payment details to the backend view
+                    function sendData() {
+                        fetch(url, {
+                            method: "POST", // Correct the method assignment
+                            headers: { // Correct the 'header' to 'headers'
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": csrftoken,
+                            },
+                            // Send the body with all details about the payment
+                            body: JSON.stringify({
+                                orderID: orderID,
+                                transID: details.id,
+                                payment_method: payment_method,
+                                status: details.status,
+                            }),
+                        })
+                        .then(response => response.json())
+                      
+                        //redirect the user to the order_complete view
+                        .then((data) =>{
+                            window.location.href = redirect_url + '?order_number'+data.order_number+'&payment_id'+data.transID;
+                        });
+                    }
+
+                    sendData(); // Ensure the sendData function is called
                 });
             },
 
             // Handle payment error
             onError: function(err) {
-                console.error('An error occurred during the transaction', err);
+                console.error('An error occurred during the transaction:', err);
             }
         }).render('#paypal-button-container');
     });
 </script>
+
 
 {% endblock %}
