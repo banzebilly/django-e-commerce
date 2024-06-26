@@ -148,26 +148,41 @@ def order_complete(request):
     order_number = request.GET.get('order_number')
     transID = request.GET.get('payment_id')
 
-    
-        
-    order = Order.objects.get(order_number=order_number, is_ordered=True)
-    ordered_products = OrderProduct.objects.filter(order_id=order.id)
+    # Debug output for URL parameters
+    print(f"Received order_number: {order_number}")
+    print(f"Received transID: {transID}")
 
-    subtotal = 0
-    for i in  ordered_products:
-        subtotal += i.product_price * i.quantity
+    try:
+        # Fetch the order with the given order number and is_ordered=True
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        print(f"Order found: {order}")  # Debug output for the order
 
-    payment = Payment.objects.get(payment_id=transID)
+        # Fetch the products related to this order
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+        print(f"Ordered products: {ordered_products.count()}")  # Debug output for ordered products
 
-    context = {
-        'order': order,
-        'ordered_products': ordered_products,
-        'order_number': order.order_number,
-        'transID': payment.payment_id,
-        'payment': payment,
-        'subtotal': subtotal,
-    }
-    return render(request, 'orders/order_complete.html', context)
+        subtotal = 0
+        for i in ordered_products:
+            subtotal += i.product_price * i.quantity
 
-    # except (Payment.DoesNotExist, Order.DoesNotExist):
-    #     return redirect('home')
+        # Fetch the payment details
+        payment = Payment.objects.get(payment_id=transID)
+        print(f"Payment found: {payment}")  # Debug output for the payment
+
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+            'payment': payment,
+            'subtotal': subtotal,
+        }
+        return render(request, 'orders/order_complete.html', context)
+
+    except Order.DoesNotExist:
+        print("Order does not exist or is not marked as ordered.")  # Debug output for order error
+        return redirect('home')
+    except Payment.DoesNotExist:
+        print("Payment does not exist.")  # Debug output for payment error
+        return redirect('home')
+

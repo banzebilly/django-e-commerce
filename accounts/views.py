@@ -1,13 +1,14 @@
-from django.shortcuts import render
 
-from django.shortcuts import redirect, render
-from .forms import RegistrationForm
+
+from django.shortcuts import redirect, render, get_object_or_404
+from .forms import RegistrationForm, UserForm, UserProfileForm
 from .models import Account
 from django.contrib import messages, auth
 from django.http import HttpResponse
 from cart.models import Cart, CartItem, Variation
 from cart.views import _cart_id
-
+from orders.models import Order
+from .models import UserProfile
 from django.contrib.auth.decorators import login_required
 #verification email
 from django.contrib.sites.shortcuts import get_current_site
@@ -171,7 +172,14 @@ def activate(request, uidb64, token):
 #======================dashboard+++++++++++++++function=================
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request,  'accounts/dashboard.html')
+
+    #take the number of product this person has ordered
+    orders = Order.objects.order_by('created_at').filter(user_id=request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    context = {
+        'orders_count': orders_count,
+    }
+    return render(request,  'accounts/dashboard.html', context)
 
 
 
@@ -248,3 +256,45 @@ def reset_password(request):
     else:
         
         return render(request, 'accounts/reset_password.html')
+
+
+
+
+
+#=================my orders functions view-===============================
+def my_orders(request):
+
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'accounts/my_orders.html', context)
+
+
+
+
+#================edit profile view========================================
+def edit_profile(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+
+    user_form = UserForm(request.POST, instance=request.user) #passs instance for updating the profile, because we re editing the 
+    profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile) #don't ve the instance need to get it
+    
+    if user_form.is_valid() and profile_form.is_valid():
+        user_form.save()
+        profile_form.save()
+        messages.success(request, 'your profile has been updated')
+        return redirect('edit_profile')
+
+    else:
+        # it will show all the data as we use instance in the get request
+        user_form = UserForm(instance=request.user)
+        profile_form= UserProfileForm(instance=userprofile)
+
+        context = {
+            'user_form': user_form,
+            'profile_form': profile_form,
+            'userprofile': userprofile, #this will give you the path for the profile image
+        }
+
+    return render(request, 'accounts/edit_profile.html', context)
