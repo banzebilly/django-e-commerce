@@ -268,7 +268,7 @@ def reset_password(request):
 
 
 #=================my orders functions view-===============================
-@login_required (login_url='login')
+@login_required (login_url'login')
 def my_orders(request):
 
     orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
@@ -279,7 +279,7 @@ def my_orders(request):
 
 
 #================edit profile view========================================
-@login_required (login_url='login')
+@login_required (login_url'login')
 def edit_profile(request):
     userprofile = get_object_or_404(UserProfile, user=request.user)
 
@@ -308,7 +308,7 @@ def edit_profile(request):
 
 
 #====================change-password===============================view
-@login_required (login_url='login')
+@login_required (login_url'login')
 def change_password(request):
     if request.method == 'POST':
         current_password = request.POST['current_password']
@@ -322,7 +322,7 @@ def change_password(request):
             if success:
                 user.set_password(new_password)
                 user.save()
-                #auth.logout(request)
+                #auth.loggout(request)
                 messages.success(request, 'password updated successfully')
                 return redirect('change_password')
             else:

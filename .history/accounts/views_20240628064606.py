@@ -322,7 +322,7 @@ def change_password(request):
             if success:
                 user.set_password(new_password)
                 user.save()
-                #auth.logout(request)
+                #auth.loggout(request)
                 messages.success(request, 'password updated successfully')
                 return redirect('change_password')
             else:

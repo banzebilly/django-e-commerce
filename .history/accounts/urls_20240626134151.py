@@ -20,8 +20,6 @@ urlpatterns = [
     path('my_orders/', views.my_orders, name="my_orders"),
     #===========edit profile url========================
     path('edit_profile', views.edit_profile, name="edit_profile"),
-    #change password===========================================================
-    path('change_password/', views.change_password, name='change_password'),
     
     
   

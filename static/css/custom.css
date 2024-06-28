@@ -6,28 +6,32 @@
 .rate {
   display: inline-block;
   border: 0;
+  position: relative;
 }
 
 .rate > label {
   float: right;
+  position: relative;
+  z-index: 1;
 }
 
-/* Show stars, it will show 10 stars */
+/* Show stars */
 .rate > label:before {
   display: inline-block;
   font-size: 1.1rem;
   font-family: FontAwesome;
-  content: "\f005";
+  content: "\f005"; /* full star */
   margin: 0;
   padding: 0.3rem 0.2rem;
   cursor: pointer;
 }
 
-/* Half star, it will show 5 stars */
+/* Half star */
 .rate .half:before {
-  content: "\f089";
+  content: "\f089"; /* half star */
   position: absolute;
   padding-right: 0;
+  z-index: 2;
 }
 
 /* Click and hover */
@@ -44,8 +48,7 @@ label:hover ~ input:checked ~ label {
   color: #cc9000;
 }
 
-.rating-star i {
+/* Rating stars display for average rating */
+.rating_star i {
   color: #cc9000 !important;
 }
-
-
