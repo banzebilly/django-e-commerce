@@ -26,7 +26,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">Total Order</h5>
                                 <h4>{{orders_count}}</h4>
-                                <a href="">View Orders</a>
+                                <a href="{% url 'my_orders'%}">View Orders</a>
                             </div>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                     <div class="col-md-6 mb-3"> <!-- Added mb-3 for margin-bottom -->
                         <div class="card text-center">
                             <div class="card-body d-flex align-items-center"> <!-- Flexbox alignment for better layout -->
-                                <img src="{% static 'images/items/billy4.jpg' %}" alt="user profile" width="50" height="50" style="border-radius: 50%; margin-right: 10px;"> <!-- Margin for spacing -->
+                                <img src="{{ userprofile.profile_picture.url}}" alt="user profile" width="50" height="50" style="border-radius: 50%; margin-right: 10px;"> <!-- Margin for spacing -->
                                 <div>
                                     <p>{{ user.email }}</p>
                                     <p>{{ user.phone_number }}</p>

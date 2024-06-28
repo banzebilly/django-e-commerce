@@ -7,7 +7,7 @@ from django.contrib import messages, auth
 from django.http import HttpResponse
 from cart.models import Cart, CartItem, Variation
 from cart.views import _cart_id
-from orders.models import Order
+from orders.models import Order, OrderProduct
 from .models import UserProfile
 from django.contrib.auth.decorators import login_required
 #verification email
@@ -175,22 +175,25 @@ def activate(request, uidb64, token):
     
     
     
-#======================dashboard+++++++++++++++function=================
+#======================dashboard+++++++++++++++function==============================================================
 @login_required(login_url='login')
 def dashboard(request):
 
     #take the number of product this person has ordered
     orders = Order.objects.order_by('created_at').filter(user_id=request.user.id, is_ordered=True)
     orders_count = orders.count()
+    #get profile picture====
+    userprofile = UserProfile.objects.get(user_id=request.user.id)
     context = {
         'orders_count': orders_count,
+        'userprofile': userprofile,
     }
     return render(request,  'accounts/dashboard.html', context)
 
 
 
 
-#==================forgot password function here=======================
+#==================forgot password function here========================================================
 
 def forgot_password(request):
     
@@ -199,7 +202,7 @@ def forgot_password(request):
         if Account.objects.filter(email=email).exists():
             user = Account.objects.get(email__exact=email)
             
-             # resert password  through email activation
+             # reset password  through email activation
             current_site = get_current_site(request)
             mail_subject = 'please Reset your password'
             message = render_to_string('accounts/reset_password_email.html', {
@@ -253,7 +256,7 @@ def reset_password(request):
             user = Account.objects.get(pk=uid)
             user.set_password(password)
             user.save()
-            messages.success(request, 'passsword reset succesfully')
+            messages.success(request, 'password reset successfully')
             return redirect('login')
             
         else:
@@ -330,7 +333,21 @@ def change_password(request):
                 return redirect('change_password')
         else:
             message.error(request, 'password do not match')
-    else:
-        render(request, 'accounts/change_password')               
+            
 
     return  render(request, 'accounts/change_password.html')
+
+#============================order detail views============================================
+def order_detail(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+
+    subtotal = 0
+    for i in order_detail:
+        subtotal += i.product_price * i.quantity
+    context = {
+        'order_detail': order_detail,
+        'order': order,
+        'subtotal': subtotal,
+    }
+    return  render(request, 'accounts/order_detail.html', context)    
