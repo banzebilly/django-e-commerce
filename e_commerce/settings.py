@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+
 from django.contrib.messages import constants as messages
 from decouple import config
 
@@ -163,20 +166,21 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-STATIC_URL = '/static/' #This defines the base URL to serve static files from during development.
-STATIC_ROOT = BASE_DIR  / 'static'  #This specifies the directory where Django will collect static files from all your 
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Use 'staticfiles' instead of 'static' to avoid conflicts
 STATICFILES_DIRS = [
-    BASE_DIR / 'e_commerce/static',  #This is a list of directories where Django will also look for static files besides the app-specific static directories. This is useful for project-wide static files.
-
-] 
+    BASE_DIR / 'e_commerce/static',  # Ensure this directory exists and contains necessary files
+]
 
 # Media files
-MEDIA_URL = '/media/'    # this sets the base URL to serve media files from.
-MEDIA_ROOT = BASE_DIR / 'media'     #This specifies the directory where media files uploaded by users will be stored.
-  
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Extra settings for AWS Elastic Beanstalk
+if 'AWS_EXECUTION_ENV' in os.environ:  # Only applies in AWS environment
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
 
  
 # Django messages configuration
