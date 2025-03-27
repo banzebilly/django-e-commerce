@@ -17,18 +17,17 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from .utils import send_verification_email
+# from django.conf import settings
 #request library 
 import requests
 # for sending email fast
 from threading import Thread
 from .utils import EmailThread
-
-
-
-
 # from .forms import RegistrationForm
 
 # Create your views here.
+
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -51,19 +50,13 @@ def register(request):
             profile.save() #the user profile is created but does not have  any other value except the default one
             #this code here help us for a password recovery
             #user activation
-            current_site = get_current_site(request)
-            mail_subject = 'please activate your  account'
-            message = render_to_string('accounts/account_verification_email.html', {
-                'user': user,
-                'domain': current_site,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-            })
-            to_email = email
-            send_email = EmailMessage(mail_subject, message, to=[to_email])
-            send_email.send()
-            messages.success(request, 'Thanks for registering with us. we have sent you  a verification email to your email adress.')
-            return redirect('/accounts/login/?command=verification&email='+email)
+                #=========================email verification email==================================
+            mail_subject = 'Please activate your account'
+            mail_template = 'accounts/account_verification_email.html'
+            send_verification_email(request, user, mail_subject, mail_template)
+            messages.success(request, 'we have sent you the verification email message to your email address')
+            return redirect('login')
+          
             # Redirect to success page, login page, or any other desired page
         # No need for an else block here
     else:
@@ -203,19 +196,11 @@ def forgot_password(request):
             user = Account.objects.get(email__exact=email)
             
              # reset password  through email activation
-            current_site = get_current_site(request)
+            # current_site = get_current_site(request)
             mail_subject = 'please Reset your password'
-            message = render_to_string('accounts/reset_password_email.html', {
-                'user': user,
-                'domain': current_site,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-            })
-            to_email = email 
-            send_email = EmailMessage(mail_subject, message, to=[to_email])
-            EmailThread(send_email).start()
-            messages.success(request, 'Password reset email has been sent to your email address')
-
+            mail_template = 'accounts/reset_password_email.html'
+            send_verification_email(request, user,  mail_subject, mail_template)
+            messages.success(request, 'Password reset link has been sent to your email address.')
             return redirect('login')
         
         else:

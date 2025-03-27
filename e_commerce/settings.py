@@ -51,8 +51,8 @@ INSTALLED_APPS = [
     # Providers
     'allauth.socialaccount.providers.google',
     #securing admin pane. record login attempts by duplicating the admin panel
-    'admin_honeypot',
-    # 'honeypot_signals',
+    # 'admin_honeypot',
+ 
 
 ]
 
@@ -68,27 +68,6 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
     # 'django.middleware.static.StaticFilesMiddleware',
 ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -52,6 +52,22 @@
             <p>{{ single_product.description }}.</p>
             
             <hr>
+            <!-- <div class="row">
+              <div class="item-option-select">
+                <h6>Choose Color</h6>
+                <div class="btn-group btn-group-sm btn-group-toggle form-control" data-toggle="buttons" >
+                  {% for i in single_product.variation_set.colors %}
+                    <label class="btn btn-light" value="{{ i.variation_value}}">
+                      <input type="radio" name="radio_color" value="{{ i.variation_value }}" required> 
+                      {{ i.variation_value }}
+                    </label>
+                  {% empty %}
+                    <p class="text-muted">No colors available</p>
+                  {% endfor %}
+                </div> 
+              </div>
+            </div>  -->
+
             <div class="row">
               <div class="item-option-select">
                 <h6>Choose Color</h6>
@@ -62,19 +78,9 @@
                   {% endfor %}
                 </select>
               </div>
-            </div> <!--row.// -->
+            </div> 
             
-            <div class="row">
-              <div class="item-option-select">
-                <h6>Select Size</h6>
-                <select name="size" class="form-control">
-                  <option value="" disabled selected>Select</option>
-                  {% for i in single_product.variation_set.sizes %}
-                    <option value="{{i.variation_value}}"> {{i.variation_value}} </option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>  <!--row.// --> 
+        
             
             <hr>
             {% if single_product.stock <= 0 %}
