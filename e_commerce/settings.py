@@ -166,22 +166,15 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Use 'staticfiles' instead of 'static' to avoid conflicts
+STATIC_ROOT = BASE_DIR / 'static'  
+
 STATICFILES_DIRS = [
-    BASE_DIR / 'e_commerce/static',  # Ensure this directory exists and contains necessary files
+    BASE_DIR / 'e_commerce/static',  
 ]
 
-# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-# Extra settings for AWS Elastic Beanstalk
-if 'AWS_EXECUTION_ENV' in os.environ:  # Only applies in AWS environment
-    STATIC_URL = '/static/'
-    MEDIA_URL = '/media/'
-
  
 # Django messages configuration
 MESSAGE_TAGS = {
